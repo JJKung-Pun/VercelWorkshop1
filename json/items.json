@@ -1,0 +1,58 @@
+[
+        {
+            "rarity": "1"
+            ,"damage" : "4"
+            ,"firerate" : "6"
+            ,"ammo" : "7"
+            ,"name" : "Desert Eagle"
+            ,"item_id": 1
+        }
+       ,{
+            "rarity": "1"
+            ,"damage" : "10"
+            ,"firerate" : "5"
+            ,"ammo" : "2"
+            ,"name" : "Double Barrel"
+            ,"item_id": 2
+        }
+       ,{
+            "rarity": "2"
+            ,"damage" : "2"
+            ,"firerate" : "1"
+            ,"ammo" : "35"
+            ,"name" : "SMG"
+            ,"item_id": 3
+        }
+       ,{
+            "rarity": "2"
+            ,"damage" : "5"
+            ,"firerate" : "6"
+            ,"ammo" : "10"
+            ,"name" : "Carbine"
+            ,"item_id": 4
+        }
+        ,{
+            "rarity": "3"
+            ,"damage" : "3"
+            ,"firerate" : "2"
+            ,"ammo" : "25"
+            ,"name" : "Ak47"
+            ,"item_id": 5
+        }
+       ,{
+            "rarity": "4"
+            ,"damage" : "20"
+            ,"firerate" : "8"
+            ,"ammo" : "10"
+            ,"name" : "AWM"
+            ,"item_id": 6
+        }
+       ,{
+            "rarity": "5"
+            ,"damage" : "50"
+            ,"firerate" : "9"
+            ,"ammo" : "1"
+            ,"name" : "Bazooka"
+            ,"item_id": 7
+        }
+]

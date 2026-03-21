@@ -1,0 +1,9 @@
+[
+  { "weight": 50 , "rarity" : "1",   "name": "Desert Eagle"      },
+  { "weight": 50 , "rarity" : "1",   "name": "Double Barrel"     },      
+  { "weight": 25 , "rarity" : "2",  "name": "SMG"                },  
+  { "weight": 25 , "rarity" : "2", "name": "Carbine"             },
+  { "weight": 10 , "rarity" : "3",   "name": "Ak47"              },      
+  { "weight": 5 , "rarity" : "4",  "name": "AWM"                },  
+  { "weight": 1  , "rarity" : "5", "name": "Bazooka"             }
+]
