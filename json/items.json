@@ -1,58 +1,9 @@
 [
-        {
-            "rarity": "1"
-            ,"damage" : "4"
-            ,"firerate" : "6"
-            ,"ammo" : "7"
-            ,"name" : "Desert Eagle"
-            ,"item_id": 1
-        }
-       ,{
-            "rarity": "1"
-            ,"damage" : "10"
-            ,"firerate" : "5"
-            ,"ammo" : "2"
-            ,"name" : "Double Barrel"
-            ,"item_id": 2
-        }
-       ,{
-            "rarity": "2"
-            ,"damage" : "2"
-            ,"firerate" : "1"
-            ,"ammo" : "35"
-            ,"name" : "SMG"
-            ,"item_id": 3
-        }
-       ,{
-            "rarity": "2"
-            ,"damage" : "5"
-            ,"firerate" : "6"
-            ,"ammo" : "10"
-            ,"name" : "Carbine"
-            ,"item_id": 4
-        }
-        ,{
-            "rarity": "3"
-            ,"damage" : "3"
-            ,"firerate" : "2"
-            ,"ammo" : "25"
-            ,"name" : "Ak47"
-            ,"item_id": 5
-        }
-       ,{
-            "rarity": "4"
-            ,"damage" : "20"
-            ,"firerate" : "8"
-            ,"ammo" : "10"
-            ,"name" : "AWM"
-            ,"item_id": 6
-        }
-       ,{
-            "rarity": "5"
-            ,"damage" : "50"
-            ,"firerate" : "9"
-            ,"ammo" : "1"
-            ,"name" : "Bazooka"
-            ,"item_id": 7
-        }
+  { "item_id": 1, "name": "desert eagle", "rarity": 1, "damage": 7, "firerate": 4, "ammo": 7 },
+  { "item_id": 2, "name": "double barrel", "rarity": 2, "damage": 2, "firerate": 20, "ammo": 3 },
+  { "item_id": 3, "name": "carbine", "rarity": 3, "damage": 10, "firerate": 6, "ammo": 5 },
+  { "item_id": 4, "name": "ak47", "rarity": 4, "damage": 25, "firerate": 3, "ammo": 2 },
+  { "item_id": 5, "name": "awm", "rarity": 5, "damage": 10, "firerate": 30, "ammo": 6 },
+  { "item_id": 6, "name": "ump", "rarity": 6, "damage": 35, "firerate": 2, "ammo": 1 },
+  { "item_id": 7, "name": "bazooka", "rarity": 7, "damage": 1, "firerate": 50, "ammo": 10 }
 ]
