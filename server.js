@@ -1,27 +1,32 @@
-const http = require('http')
-const api_gacha = require('./api/gacha')
-const api_stats = require('./api/stats')
-// ---------------------------------------------------------------
-const PORT = process.env.PORT || 9888
-// ---------------------------------------------------------------
-function onClientRequest(req,resp)
-{
-    const pathname = req.url.split('?')[0]
+const { MongoClient } = require('mongodb');
+const http = require('http');
 
-    resp.writeHead(200, { 'Content-Type' : 'application/json' })
+const PORT = process.env.PORT || 9888;
+const MONGO_URI = process.env.MONGO_URI;
 
-    if(req.method === 'POST' && pathname === '/api/gacha/open'){
-        api_gacha.onRequestGacha(resp)
-    }
-    if(req.method === 'POST' && pathname === '/api/stats'){
-        api_stats.onStats(resp)
-    }else{
-        resp.write(JSON.stringify( { message: 'Hello Vercel 2310511105008' } ))
-    }
-
-    resp.end()
+async function getWeapons() {
+  const client = await MongoClient.connect(MONGO_URI);
+  const db = client.db('gamdb'); // ใช้ชื่อ database ที่คุณสร้างใน Compass
+  const weapons = await db.collection('weapon').find().toArray();
+  client.close();
+  return weapons;
 }
-// ---------------------------------------------------------------
-const server = http.createServer( onClientRequest )
-server.listen(PORT)
-console.log('running on '+PORT)
+
+function onClientRequest(req, resp) {
+  const pathname = req.url.split('?')[0];
+  resp.writeHead(200, { 'Content-Type': 'application/json' });
+
+  if (req.method === 'GET' && pathname === '/api/weapons') {
+    getWeapons().then(data => {
+      resp.write(JSON.stringify(data));
+      resp.end();
+    });
+  } else {
+    resp.write(JSON.stringify({ message: 'Hello Vercel API' }));
+    resp.end();
+  }
+}
+
+const server = http.createServer(onClientRequest);
+server.listen(PORT);
+console.log('running on ' + PORT);
