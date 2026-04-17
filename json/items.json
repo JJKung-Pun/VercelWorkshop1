@@ -1,9 +1,9 @@
 [
-  { "weapon_id": 1, "name": "desert eagle", "rarity": 1, "damage": 7, "firerate": 4, "ammo": 7 },
-  { "weapon_id": 2, "name": "double barrel", "rarity": 2, "damage": 2, "firerate": 20, "ammo": 3 },
-  { "weapon_id": 3, "name": "carbine", "rarity": 3, "damage": 10, "firerate": 6, "ammo": 5 },
-  { "weapon_id": 4, "name": "ak47", "rarity": 4, "damage": 25, "firerate": 3, "ammo": 2 },
-  { "weapon_id": 5, "name": "awm", "rarity": 5, "damage": 10, "firerate": 30, "ammo": 6 },
-  { "weapon_id": 6, "name": "ump", "rarity": 6, "damage": 35, "firerate": 2, "ammo": 1 },
-  { "weapon_id": 7, "name": "bazooka", "rarity": 7, "damage": 1, "firerate": 50, "ammo": 10 }
+  { "weapon_id": 1, "weapon_name": "desert eagle", "weapon_type_id": 1, "rank": 1, "ammo": 7, "damage": 4, "firerate": 7 },
+  { "weapon_id": 2, "weapon_name": "double barrel", "weapon_type_id": 2, "rank": 1, "ammo": 2, "damage": 20, "firerate": 3 },
+  { "weapon_id": 3, "weapon_name": "carbine", "weapon_type_id": 3, "rank": 2, "ammo": 10, "damage": 6, "firerate": 5 },
+  { "weapon_id": 4, "weapon_name": "ak47", "weapon_type_id": 4, "rank": 2, "ammo": 25, "damage": 3, "firerate": 2 },
+  { "weapon_id": 5, "weapon_name": "awm", "weapon_type_id": 5, "rank": 3, "ammo": 10, "damage": 30, "firerate": 6 },
+  { "weapon_id": 6, "weapon_name": "ump", "weapon_type_id": 6, "rank": 4, "ammo": 35, "damage": 2, "firerate": 1 },
+  { "weapon_id": 7, "weapon_name": "bazooka", "weapon_type_id": 7, "rank": 5, "ammo": 1, "damage": 50, "firerate": 10 }
 ]
