@@ -4,29 +4,41 @@ const http = require('http');
 const PORT = process.env.PORT || 9888;
 const MONGO_URI = process.env.MONGO_URI;
 
+// ---------------- Mongo ----------------
 async function getWeapons() {
   const client = await MongoClient.connect(MONGO_URI);
-  const db = client.db('gamdb'); // ใช้ชื่อ database ที่คุณสร้างใน Compass
-  const weapons = await db.collection('weapon').find().toArray();
-  client.close();
-  return weapons;
+  const db = client.db('gamdb');
+
+  const data = await db.collection('weapon').find().toArray();
+
+  await client.close();
+  return data;
 }
 
-function onClientRequest(req, resp) {
+// ---------------- Server ----------------
+async function onClientRequest(req, resp) {
   const pathname = req.url.split('?')[0];
-  resp.writeHead(200, { 'Content-Type': 'application/json' });
 
-  if (req.method === 'GET' && pathname === '/api/weapons') {
-    getWeapons().then(data => {
-      resp.write(JSON.stringify(data));
-      resp.end();
-    });
-  } else {
-    resp.write(JSON.stringify({ message: 'Hello Vercel API' }));
-    resp.end();
+  try {
+    // 🔹 GET weapons
+    if (req.method === 'GET' && pathname === '/api/weapons') {
+      const data = await getWeapons();
+
+      resp.writeHead(200, { 'Content-Type': 'application/json' });
+      return resp.end(JSON.stringify(data));
+    }
+
+    // 🔹 default
+    resp.writeHead(200, { 'Content-Type': 'application/json' });
+    resp.end(JSON.stringify({ message: 'API running' }));
+
+  } catch (err) {
+    resp.writeHead(500, { 'Content-Type': 'application/json' });
+    resp.end(JSON.stringify({ error: err.message }));
   }
 }
 
 const server = http.createServer(onClientRequest);
-server.listen(PORT);
-console.log('running on ' + PORT);
+server.listen(PORT, () => {
+  console.log('running on ' + PORT);
+});
