@@ -9,18 +9,16 @@ async function onClientRequest(req, resp)
 
     try
     {
-        // ---------------- GET WEAPONS ----------------
+        // -------- GET WEAPONS --------
         if(req.method === 'GET' && pathname === '/api/weapons'){
             const data = await mongo.runMongoTest()
-
             resp.writeHead(200, { 'Content-Type': 'application/json' })
             resp.end(JSON.stringify(data))
         }
 
-        // ---------------- REGISTER ----------------
+        // -------- REGISTER --------
         else if(req.method === 'POST' && pathname === '/api/register'){
             let body = ''
-
             req.on('data', chunk => body += chunk)
 
             req.on('end', async () => {
@@ -34,14 +32,12 @@ async function onClientRequest(req, resp)
                 resp.writeHead(200, { 'Content-Type': 'application/json' })
                 resp.end(JSON.stringify(result))
             })
-
             return
         }
 
-        // ---------------- LOGIN ----------------
+        // -------- LOGIN --------
         else if(req.method === 'POST' && pathname === '/api/login'){
             let body = ''
-
             req.on('data', chunk => body += chunk)
 
             req.on('end', async () => {
@@ -55,14 +51,12 @@ async function onClientRequest(req, resp)
                 resp.writeHead(200, { 'Content-Type': 'application/json' })
                 resp.end(JSON.stringify(result))
             })
-
             return
         }
 
-        // ---------------- UPDATE CURRENCY ----------------
+        // -------- UPDATE MONEY --------
         else if(req.method === 'POST' && pathname === '/api/update-currency'){
             let body = ''
-
             req.on('data', chunk => body += chunk)
 
             req.on('end', async () => {
@@ -77,11 +71,9 @@ async function onClientRequest(req, resp)
                 resp.writeHead(200, { 'Content-Type': 'application/json' })
                 resp.end(JSON.stringify(result))
             })
-
             return
         }
 
-        // ---------------- DEFAULT ----------------
         else{
             resp.writeHead(200, { 'Content-Type': 'application/json' })
             resp.end(JSON.stringify({ message: 'API running' }))

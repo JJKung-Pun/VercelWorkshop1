@@ -1,69 +1,67 @@
-const { MongoClient } = require('mongodb')
+const { MongoClient, ObjectId } = require('mongodb')
 const bcrypt = require('bcrypt')
-const dns = require('dns')
-dns.setServers(['8.8.8.8', '1.1.1.1'])
 
-// ---------------- CONFIG ----------------
-const db_url = `mongodb+srv://admin_db:uUWYsP5UyXH5dRJ6@cluster0.rxsbvdx.mongodb.net/gamdb?retryWrites=true&w=majority`
+// 🔥 ใส่ของคุณเอง
+const db_url = "mongodb+srv://admin_db:uUWYsP5UyXH5dRJ6@cluster0.rxsbvdx.mongodb.net/gamdb?retryWrites=true&w=majority"
 
-// ---------------- GET WEAPONS ----------------
+// -------- GET WEAPON --------
 async function runMongo()
 {
-    const dbconn = await MongoClient.connect(db_url)
-    const db = dbconn.db('gamdb')
+    const conn = await MongoClient.connect(db_url)
+    const db = conn.db('gamdb')
 
     const data = await db.collection('weapon').find({}).toArray()
 
-    await dbconn.close()
+    await conn.close()
     return data
 }
 
-// ---------------- REGISTER ----------------
+// -------- REGISTER --------
 async function register(username, password)
 {
-    const dbconn = await MongoClient.connect(db_url)
-    const db = dbconn.db('gamdb')
+    const conn = await MongoClient.connect(db_url)
+    const db = conn.db('gamdb')
 
-    const collection = db.collection('player')
+    const col = db.collection('player')
 
-    const existing = await collection.findOne({ username: username })
-    if(existing){
-        await dbconn.close()
+    const exist = await col.findOne({ username })
+    if(exist){
+        await conn.close()
         return { status: "error", message: "username exists" }
     }
 
     const hash = await bcrypt.hash(password, 10)
 
-    const result = await collection.insertOne({
-        username: username,
+    const result = await col.insertOne({
+        username,
         password: hash,
         money: 0,
         diamond: 0
     })
 
-    await dbconn.close()
+    await conn.close()
 
-    return { status: "ok", player_id: result.insertedId }
+    return { status: "ok", player_id: result.insertedId.toString() }
 }
 
-// ---------------- LOGIN ----------------
+// -------- LOGIN --------
 async function login(username, password)
 {
-    const dbconn = await MongoClient.connect(db_url)
-    const db = dbconn.db('gamdb')
+    const conn = await MongoClient.connect(db_url)
+    const db = conn.db('gamdb')
 
-    const user = await db.collection('player').findOne({ username: username })
+    const user = await db.collection('player').findOne({ username })
 
     if(!user){
-        await dbconn.close()
+        await conn.close()
         return { status: "error", message: "user not found" }
     }
 
-    const match = await bcrypt.compare(password, user.password)
+    const ok = await bcrypt.compare(password, user.password)
 
-    await dbconn.close()
+    await conn.close()
 
-    if(!match){
+    if(!ok){
         return { status: "error", message: "wrong password" }
     }
 
@@ -75,28 +73,24 @@ async function login(username, password)
     }
 }
 
-// ---------------- UPDATE CURRENCY ----------------
+// -------- UPDATE --------
 async function updateCurrency(playerId, money, diamond)
 {
-    const dbconn = await MongoClient.connect(db_url)
-    const db = dbconn.db('gamdb')
+    const conn = await MongoClient.connect(db_url)
+    const db = conn.db('gamdb')
 
     await db.collection('player').updateOne(
-        { _id: new require('mongodb').ObjectId(playerId) },
+        { _id: new ObjectId(playerId) },
         {
-            $set: {
-                money: money,
-                diamond: diamond
-            }
+            $set: { money, diamond }
         }
     )
 
-    await dbconn.close()
+    await conn.close()
 
     return { status: "ok" }
 }
 
-// ---------------- EXPORT ----------------
 module.exports = {
     runMongoTest: runMongo,
     register,
