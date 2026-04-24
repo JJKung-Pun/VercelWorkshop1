@@ -3,58 +3,32 @@ const mongo = require('./libs/mongo')
 
 const PORT = process.env.PORT || 9888
 
-async function onClientRequest(req, resp)
+async function onRequest(req, res)
 {
-    const pathname = req.url.split('?')[0]
+    const url = req.url
 
-    try
+    if(url === "/api/gacha")
     {
-        // -------- GET WEAPONS --------
-        if(req.method === 'GET' && pathname === '/api/weapons')
+        let body = ''
+
+        req.on('data', c => body += c)
+
+        req.on('end', async () =>
         {
-            const data = await mongo.runMongoTest()
+            const data = JSON.parse(body)
+            const playerId = data.player_id
+            const gachaId = data.gacha_id
 
-            resp.writeHead(200, { 'Content-Type': 'application/json' })
-            resp.end(JSON.stringify(data))
-            return
-        }
+            const result = await mongo.runGacha(playerId, gachaId)
 
-        // -------- UPDATE CURRENCY --------
-        else if(req.method === 'POST' && pathname === '/api/update-currency')
-        {
-            let body = ''
+            res.writeHead(200, { "Content-Type": "application/json" })
+            res.end(JSON.stringify(result))
+        })
 
-            req.on('data', chunk => body += chunk)
-
-            req.on('end', async () => {
-                const data = JSON.parse(body)
-
-                const result = await mongo.updateCurrency(
-                    data.player_id,
-                    data.money,
-                    data.diamond
-                )
-
-                resp.writeHead(200, { 'Content-Type': 'application/json' })
-                resp.end(JSON.stringify(result))
-            })
-
-            return
-        }
-
-        else
-        {
-            resp.writeHead(200, { 'Content-Type': 'application/json' })
-            resp.end(JSON.stringify({ message: "API running" }))
-            return
-        }
+        return
     }
-    catch(err)
-    {
-        resp.writeHead(500, { 'Content-Type': 'application/json' })
-        resp.end(JSON.stringify({ error: err.message }))
-    }
+
+    res.end("OK")
 }
 
-http.createServer(onClientRequest).listen(PORT)
-console.log("running " + PORT)
+http.createServer(onRequest).listen(PORT)
