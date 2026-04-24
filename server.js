@@ -1,44 +1,35 @@
-const { MongoClient } = require('mongodb');
-const http = require('http');
+const http = require('http')
+const mongo = require('./mongo')
 
-const PORT = process.env.PORT || 9888;
-const MONGO_URI = process.env.MONGO_URI;
+// ---------------------------------------------------------------
+const PORT = process.env.PORT || 9888
+// ---------------------------------------------------------------
+async function onClientRequest(req, resp)
+{
+    const pathname = req.url.split('?')[0]
 
-// ---------------- Mongo ----------------
-async function getWeapons() {
-  const client = await MongoClient.connect(MONGO_URI);
-  const db = client.db('gamdb');
+    try
+    {
+        if(req.method === 'GET' && pathname === '/api/weapons'){
+            const data = await mongo.getWeapons()
 
-  const data = await db.collection('weapon').find().toArray();
-
-  await client.close();
-  return data;
-}
-
-// ---------------- Server ----------------
-async function onClientRequest(req, resp) {
-  const pathname = req.url.split('?')[0];
-
-  try {
-    // 🔹 GET weapons
-    if (req.method === 'GET' && pathname === '/api/weapons') {
-      const data = await getWeapons();
-
-      resp.writeHead(200, { 'Content-Type': 'application/json' });
-      return resp.end(JSON.stringify(data));
+            resp.writeHead(200, { 'Content-Type': 'application/json' })
+            resp.write(JSON.stringify(data))
+        }
+        else{
+            resp.writeHead(200, { 'Content-Type': 'application/json' })
+            resp.write(JSON.stringify({ message: 'Hello Vercel class' }))
+        }
+    }
+    catch(err)
+    {
+        resp.writeHead(500, { 'Content-Type': 'application/json' })
+        resp.write(JSON.stringify({ error: err.message }))
     }
 
-    // 🔹 default
-    resp.writeHead(200, { 'Content-Type': 'application/json' });
-    resp.end(JSON.stringify({ message: 'API running' }));
-
-  } catch (err) {
-    resp.writeHead(500, { 'Content-Type': 'application/json' });
-    resp.end(JSON.stringify({ error: err.message }));
-  }
+    resp.end()
 }
-
-const server = http.createServer(onClientRequest);
-server.listen(PORT, () => {
-  console.log('running on ' + PORT);
-});
+// ---------------------------------------------------------------
+const server = http.createServer(onClientRequest)
+server.listen(PORT)
+console.log('running on ' + PORT)
