@@ -1,30 +1,69 @@
 const http = require('http')
 const mongo = require('./libs/mongo')
 
-// ---------------------------------------------------------------
 const PORT = process.env.PORT || 9888
-// ---------------------------------------------------------------
+
 async function onClientRequest(req, resp)
 {
     const pathname = req.url.split('?')[0]
 
     try
     {
-        // 🔹 GET weapons
+        // ---------------- GET WEAPONS ----------------
         if(req.method === 'GET' && pathname === '/api/weapons'){
             const data = await mongo.runMongoTest()
 
             resp.writeHead(200, { 'Content-Type': 'application/json' })
-            resp.write(JSON.stringify(data))
+            resp.end(JSON.stringify(data))
         }
 
-        // 🔹 POST update currency
+        // ---------------- REGISTER ----------------
+        else if(req.method === 'POST' && pathname === '/api/register'){
+            let body = ''
+
+            req.on('data', chunk => body += chunk)
+
+            req.on('end', async () => {
+                const data = JSON.parse(body)
+
+                const result = await mongo.register(
+                    data.username,
+                    data.password
+                )
+
+                resp.writeHead(200, { 'Content-Type': 'application/json' })
+                resp.end(JSON.stringify(result))
+            })
+
+            return
+        }
+
+        // ---------------- LOGIN ----------------
+        else if(req.method === 'POST' && pathname === '/api/login'){
+            let body = ''
+
+            req.on('data', chunk => body += chunk)
+
+            req.on('end', async () => {
+                const data = JSON.parse(body)
+
+                const result = await mongo.login(
+                    data.username,
+                    data.password
+                )
+
+                resp.writeHead(200, { 'Content-Type': 'application/json' })
+                resp.end(JSON.stringify(result))
+            })
+
+            return
+        }
+
+        // ---------------- UPDATE CURRENCY ----------------
         else if(req.method === 'POST' && pathname === '/api/update-currency'){
             let body = ''
 
-            req.on('data', chunk => {
-                body += chunk
-            })
+            req.on('data', chunk => body += chunk)
 
             req.on('end', async () => {
                 const data = JSON.parse(body)
@@ -42,20 +81,19 @@ async function onClientRequest(req, resp)
             return
         }
 
+        // ---------------- DEFAULT ----------------
         else{
             resp.writeHead(200, { 'Content-Type': 'application/json' })
-            resp.write(JSON.stringify({ message: 'API running' }))
+            resp.end(JSON.stringify({ message: 'API running' }))
         }
     }
     catch(err)
     {
         resp.writeHead(500, { 'Content-Type': 'application/json' })
-        resp.write(JSON.stringify({ error: err.message }))
+        resp.end(JSON.stringify({ error: err.message }))
     }
-
-    resp.end()
 }
-// ---------------------------------------------------------------
+
 const server = http.createServer(onClientRequest)
 server.listen(PORT)
 console.log('running on ' + PORT)
