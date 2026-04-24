@@ -1,18 +1,17 @@
+// server.js
 const http = require('http')
 const mongo = require('./libs/mongo')
 
 const PORT = process.env.PORT || 9888
 
-async function onClientRequest(req, resp)
-{
+async function onClientRequest(req, resp) {
     const pathname = req.url.split('?')[0]
 
-    try
-    {
+    try {
         // ---------------- WEAPONS ----------------
-        if(req.method === 'GET' && pathname === '/api/weapons')
-        {
-            const data = await mongo.runMongoTest()
+        if (req.method === 'GET' && pathname === '/api/weapons') {
+            const db = await mongo.getDB()
+            const data = await db.collection("weapon").find({}).toArray()
 
             resp.writeHead(200, { 'Content-Type': 'application/json' })
             resp.end(JSON.stringify(data))
@@ -20,13 +19,10 @@ async function onClientRequest(req, resp)
         }
 
         // ---------------- UPDATE CURRENCY ----------------
-        else if(req.method === 'POST' && pathname === '/api/update-currency')
-        {
+        else if (req.method === 'POST' && pathname === '/api/update-currency') {
             let body = ''
 
-            req.on('data', chunk => {
-                body += chunk
-            })
+            req.on('data', chunk => body += chunk)
 
             req.on('end', async () => {
                 try {
@@ -40,27 +36,21 @@ async function onClientRequest(req, resp)
 
                     resp.writeHead(200, { 'Content-Type': 'application/json' })
                     resp.end(JSON.stringify(result))
-                }
-                catch(err)
-                {
+                } catch (err) {
                     resp.writeHead(400, { 'Content-Type': 'application/json' })
                     resp.end(JSON.stringify({ error: "invalid json" }))
                 }
             })
-
             return
         }
 
         // ---------------- DEFAULT ----------------
-        else
-        {
+        else {
             resp.writeHead(200, { 'Content-Type': 'application/json' })
             resp.end(JSON.stringify({ message: 'API running' }))
             return
         }
-    }
-    catch(err)
-    {
+    } catch (err) {
         resp.writeHead(500, { 'Content-Type': 'application/json' })
         resp.end(JSON.stringify({ error: err.message }))
         return
