@@ -6,7 +6,7 @@ dns.setServers(['8.8.8.8', '1.1.1.1'])
 const db_protocol = `mongodb+srv://`,
       db_host     = `cluster0.rxsbvdx.mongodb.net`,   // 👈 จากของนาย
       db_port     = ``,
-      db_path     = `/gamdb?retryWrites=true&w=majority`, // 👈 ใส่ DB ตรงนี้
+      db_path     = `/gamdb?retryWrites=true&w=majority&appName=Cluster0`, // 👈 ใส่ DB ตรงนี้
       db_url      = db_protocol + db_host + db_port + db_path
 
 let authuser = {
