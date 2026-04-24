@@ -64,6 +64,41 @@ async function onClientRequest(req, resp) {
             return
         }
 
+        // ---------------- UPDATE CURRENCY ----------------
+        else if (req.method === 'POST' && pathname === '/api/updateCurrency') {
+            let body = ''
+            req.on('data', chunk => body += chunk)
+
+            req.on('end', async () => {
+                try {
+                    const data = JSON.parse(body || "{}")
+                    const playerId = parseInt(data.playerId)
+                    const money = parseInt(data.money)
+                    const diamond = parseInt(data.diamond)
+
+                    const db = await mongo.getDB()
+                    await db.collection("player").updateOne(
+                        { player_id: playerId },
+                        { $inc: { money: money, diamond: diamond } },
+                        { upsert: true }
+                    )
+
+                    resp.writeHead(200, { 'Content-Type': 'application/json' })
+                    resp.end(JSON.stringify({
+                        status: "ok",
+                        message: "Currency updated",
+                        playerId,
+                        money,
+                        diamond
+                    }))
+                } catch (err) {
+                    resp.writeHead(400, { 'Content-Type': 'application/json' })
+                    resp.end(JSON.stringify({ error: "invalid json" }))
+                }
+            })
+            return
+        }
+
         // ---------------- DEFAULT ----------------
         else {
             resp.writeHead(200, { 'Content-Type': 'application/json' })
