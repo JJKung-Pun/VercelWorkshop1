@@ -17,6 +17,29 @@ async function onClientRequest(req, resp) {
             return
         }
 
+        // ---------------- PLAYER ----------------
+        else if (req.method === 'GET' && pathname === '/api/player') {
+            const urlParams = new URLSearchParams(req.url.split('?')[1]);
+            const playerId = parseInt(urlParams.get('playerId'));
+
+            const db = await mongo.getDB();
+            const player = await db.collection("player").findOne({ player_id: playerId });
+
+            if (!player) {
+                resp.writeHead(404, { 'Content-Type': 'application/json' });
+                resp.end(JSON.stringify({ status: "fail", message: "no player" }));
+                return;
+            }
+
+            resp.writeHead(200, { 'Content-Type': 'application/json' });
+            resp.end(JSON.stringify({
+                player_id: player.player_id,
+                money: player.money,
+                diamond: player.diamond
+            }));
+            return;
+        }
+
         // ---------------- GACHA ----------------
         else if (req.method === 'POST' && pathname === '/api/gacha') {
             let body = ''
@@ -27,7 +50,7 @@ async function onClientRequest(req, resp) {
                     const data = JSON.parse(body || "{}")
 
                     const result = await mongo.runGacha(
-                        data.playerId,
+                        parseInt(data.playerId),
                         parseInt(data.gachaId)
                     )
 
