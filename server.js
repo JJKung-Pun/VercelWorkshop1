@@ -10,15 +10,41 @@ async function onClientRequest(req, resp)
 
     try
     {
+        // 🔹 GET weapons
         if(req.method === 'GET' && pathname === '/api/weapons'){
             const data = await mongo.runMongoTest()
 
             resp.writeHead(200, { 'Content-Type': 'application/json' })
             resp.write(JSON.stringify(data))
         }
+
+        // 🔹 POST update currency
+        else if(req.method === 'POST' && pathname === '/api/update-currency'){
+            let body = ''
+
+            req.on('data', chunk => {
+                body += chunk
+            })
+
+            req.on('end', async () => {
+                const data = JSON.parse(body)
+
+                const result = await mongo.updateCurrency(
+                    data.player_id,
+                    data.money,
+                    data.diamond
+                )
+
+                resp.writeHead(200, { 'Content-Type': 'application/json' })
+                resp.end(JSON.stringify(result))
+            })
+
+            return
+        }
+
         else{
             resp.writeHead(200, { 'Content-Type': 'application/json' })
-            resp.write(JSON.stringify({ message: 'Hello Vercel class' }))
+            resp.write(JSON.stringify({ message: 'API running' }))
         }
     }
     catch(err)

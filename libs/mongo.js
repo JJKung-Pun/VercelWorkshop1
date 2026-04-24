@@ -25,20 +25,40 @@ async function runMongo()
     const dbconn = await MongoClient.connect(db_url, options)
     const db = dbconn.db('gamdb')
 
-    console.log('Connected to MongoDB')
-
     const collection = db.collection('weapon')
-
-    // ❌ ลบ insert ของอาจารย์ออก (ไม่งั้นพังบน Vercel)
-    // ✅ ใช้ find อย่างเดียว
     const data = await collection.find({}).toArray()
 
     await dbconn.close()
 
-    return data   // 🔥 สำคัญ: ต้อง return
+    return data
+}
+
+// ---------------- UPDATE CURRENCY ----------------
+async function updateCurrency(playerId, money, diamond)
+{
+    const dbconn = await MongoClient.connect(db_url, options)
+    const db = dbconn.db('gamdb')
+
+    const collection = db.collection('player')
+
+    await collection.updateOne(
+        { player_id: playerId },
+        {
+            $set: {
+                money: money,
+                diamond: diamond
+            }
+        },
+        { upsert: true }
+    )
+
+    await dbconn.close()
+
+    return { status: "ok" }
 }
 
 // ---------------- Export ----------------
 module.exports = {
-    runMongoTest: runMongo
+    runMongoTest: runMongo,
+    updateCurrency: updateCurrency
 }
