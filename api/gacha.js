@@ -1,14 +1,32 @@
-const rates = require('../json/gacha_rate.json')
-const items = require('../json/items.json')
-const rands = require('../libs/random')
+const mongo = require('../libs/mongo')
 
-// --------------------------------------------------------------------
-function onRequestGacha(resp)
-{
-    resp.write( JSON.stringify(rands.drawGacha(rates, items)) )
-}
-// --------------------------------------------------------------------
+module.exports = async (req, res) => {
+    try {
+        if (req.method !== 'POST') {
+            return res.status(405).json({ error: "POST only" })
+        }
 
-module.exports = {
-    onRequestGacha
+        // 🔥 กัน body undefined (สำคัญมาก)
+        const body = typeof req.body === "string"
+            ? JSON.parse(req.body)
+            : req.body
+
+        const playerId = body?.playerId
+        const gachaId = body?.gachaId
+
+        if (!playerId || !gachaId) {
+            return res.status(400).json({ error: "missing data" })
+        }
+
+        const result = await mongo.runGacha(playerId, gachaId)
+
+        return res.status(200).json(result)
+
+    } catch (err) {
+        console.error("GACHA ERROR:", err)
+        return res.status(500).json({
+            error: err.message,
+            stack: err.stack
+        })
+    }
 }
