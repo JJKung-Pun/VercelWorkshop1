@@ -1,47 +1,71 @@
 const http = require('http')
-const mongo = require('./mongo')
+const mongo = require('./libs/mongo')
 
 const PORT = process.env.PORT || 9888
 
-async function onClientRequest(req, res)
+async function onClientRequest(req, resp)
 {
-    const path = req.url.split('?')[0]
-
-    res.setHeader('Content-Type', 'application/json')
+    const pathname = req.url.split('?')[0]
 
     try
     {
-        // 🎰 GACHA API
-        if (req.method === 'POST' && path === '/api/gacha')
+        // ---------------- WEAPONS ----------------
+        if(req.method === 'GET' && pathname === '/api/weapons')
         {
-            let body = ""
+            const data = await mongo.runMongoTest()
 
-            req.on('data', chunk => body += chunk)
+            resp.writeHead(200, { 'Content-Type': 'application/json' })
+            resp.end(JSON.stringify(data))
+            return
+        }
 
-            req.on('end', async () =>
-            {
-                const data = JSON.parse(body)
+        // ---------------- UPDATE CURRENCY ----------------
+        else if(req.method === 'POST' && pathname === '/api/update-currency')
+        {
+            let body = ''
 
-                const result = await mongo.runGacha(
-                    data.playerId,
-                    data.gachaId
-                )
+            req.on('data', chunk => {
+                body += chunk
+            })
 
-                res.end(JSON.stringify(result))
+            req.on('end', async () => {
+                try {
+                    const data = JSON.parse(body || "{}")
+
+                    const result = await mongo.updateCurrency(
+                        data.player_id,
+                        data.money,
+                        data.diamond
+                    )
+
+                    resp.writeHead(200, { 'Content-Type': 'application/json' })
+                    resp.end(JSON.stringify(result))
+                }
+                catch(err)
+                {
+                    resp.writeHead(400, { 'Content-Type': 'application/json' })
+                    resp.end(JSON.stringify({ error: "invalid json" }))
+                }
             })
 
             return
         }
 
-        res.end(JSON.stringify({ status: "running" }))
+        // ---------------- DEFAULT ----------------
+        else
+        {
+            resp.writeHead(200, { 'Content-Type': 'application/json' })
+            resp.end(JSON.stringify({ message: 'API running' }))
+            return
+        }
     }
-    catch (err)
+    catch(err)
     {
-        res.statusCode = 500
-        res.end(JSON.stringify({ error: err.message }))
+        resp.writeHead(500, { 'Content-Type': 'application/json' })
+        resp.end(JSON.stringify({ error: err.message }))
+        return
     }
 }
 
 http.createServer(onClientRequest).listen(PORT)
-
-console.log("server running")
+console.log('running on ' + PORT)
