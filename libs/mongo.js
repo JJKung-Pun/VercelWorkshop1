@@ -1,30 +1,57 @@
-const { MongoClient } = require("mongodb")
+const { MongoClient } = require('mongodb')
 
-const url = "mongodb+srv://cluster0.rxsbvdx.mongodb.net/gamdb?retryWrites=true&w=majority"
+// ---------------- DB CONFIG ----------------
+const db_protocol = `mongodb+srv://`,
+      db_host     = `cluster0.rxsbvdx.mongodb.net`,
+      db_path     = `/gamdb?retryWrites=true&w=majority`,
+      db_url      = db_protocol + db_host + db_path
 
-const auth = {
-    username: "admin_db",
-    password: "uUWYsP5UyXH5dRJ6"
+let authuser = {
+    username: `admin_db`,
+    password: `uUWYsP5UyXH5dRJ6`
 }
 
-const options = {
-    auth: auth,
-    authMechanism: "SCRAM-SHA-1"
+let options = {
+    auth: authuser,
+    authMechanism: `SCRAM-SHA-1`
 }
 
-let client = null
-
+// ---------------- CONNECT ----------------
 async function getDB()
 {
-    if(!client)
-    {
-        client = await MongoClient.connect(url, options)
-    }
-    return client.db("gamdb")
+    const client = await MongoClient.connect(db_url, options)
+    return client.db('gamdb')
 }
 
-// 🎰 MAIN GACHA SYSTEM
-async function runGacha(playerId, gachaId)
+// ---------------- GET WEAPONS ----------------
+async function runMongo()
+{
+    const db = await getDB()
+    const data = await db.collection('weapon').find({}).toArray()
+    return data
+}
+
+// ---------------- UPDATE CURRENCY ----------------
+async function updateCurrency(playerId, money, diamond)
+{
+    const db = await getDB()
+
+    await db.collection('player').updateOne(
+        { player_id: playerId },
+        {
+            $set: {
+                money: money,
+                diamond: diamond
+            }
+        },
+        { upsert: true }
+    )
+
+    return { status: "ok" }
+}
+
+// ---------------- 🎰 GACHA SYSTEM (MONEY + DIAMOND) ----------------
+async function runGacha(playerId, gachaId, currency)
 {
     const db = await getDB()
 
@@ -32,48 +59,51 @@ async function runGacha(playerId, gachaId)
     const poolCol = db.collection("gacha_weapon")
     const weaponCol = db.collection("weapon")
 
-    // 👤 check player
     const player = await players.findOne({ player_id: playerId })
 
     if(!player)
-    {
         return { status: "fail", message: "player not found" }
-    }
 
     const cost = 100
-    const money = Number(player.money)
 
-    if(money < cost)
+    // 💰 ใช้เงินแบบเลือกได้
+    if(currency === "diamond")
     {
-        return { status: "fail", message: "not enough money" }
+        if(player.diamond < cost)
+            return { status: "fail", message: "not enough diamond" }
+
+        await players.updateOne(
+            { player_id: playerId },
+            { $inc: { diamond: -cost } }
+        )
+    }
+    else
+    {
+        if(player.money < cost)
+            return { status: "fail", message: "not enough money" }
+
+        await players.updateOne(
+            { player_id: playerId },
+            { $inc: { money: -cost } }
+        )
     }
 
-    // 💸 หักเงิน
-    await players.updateOne(
-        { player_id: playerId },
-        { $inc: { money: -cost } }
-    )
-
-    // 🎲 pool กาชา
+    // 🎲 pool gacha
     const pool = await poolCol.find({ gacha_id: gachaId }).toArray()
 
     if(pool.length === 0)
-    {
         return { status: "fail", message: "no gacha data" }
-    }
 
-    // 🎯 random weight
     let total = 0
-    for(const w of pool)
-        total += Number(w.drop_rate)
+    pool.forEach(w => total += w.drop_rate)
 
     let r = Math.random() * total
     let sum = 0
     let selected = pool[0]
 
-    for(const w of pool)
+    for(let w of pool)
     {
-        sum += Number(w.drop_rate)
+        sum += w.drop_rate
         if(r <= sum)
         {
             selected = w
@@ -81,17 +111,10 @@ async function runGacha(playerId, gachaId)
         }
     }
 
-    // 🔫 weapon info
-    const weapon = await weaponCol.findOne({
-        weapon_id: selected.weapon_id
-    })
+    // 🧾 get weapon
+    const weapon = await weaponCol.findOne({ weapon_id: selected.weapon_id })
 
-    if(!weapon)
-    {
-        return { status: "fail", message: "weapon not found" }
-    }
-
-    // 📦 save inventory
+    // 💾 save inventory
     await db.collection("player_weapon").insertOne({
         player_id: playerId,
         weapon_id: selected.weapon_id
@@ -101,10 +124,14 @@ async function runGacha(playerId, gachaId)
         status: "ok",
         weapon: weapon.weapon_name,
         weapon_id: weapon.weapon_id,
-        money_left: money - cost
+        money_left: currency === "money" ? player.money - cost : player.money,
+        diamond_left: currency === "diamond" ? player.diamond - cost : player.diamond
     }
 }
 
+// ---------------- EXPORT ----------------
 module.exports = {
+    runMongo,
+    updateCurrency,
     runGacha
 }

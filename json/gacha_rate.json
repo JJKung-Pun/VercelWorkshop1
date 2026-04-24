@@ -1,9 +1,28 @@
 [
-  { "weight": 50 , "rarity" : "1",   "name": "Desert Eagle"      },
-  { "weight": 50 , "rarity" : "1",   "name": "Double Barrel"     },      
-  { "weight": 25 , "rarity" : "2",  "name": "SMG"                },  
-  { "weight": 25 , "rarity" : "2", "name": "Carbine"             },
-  { "weight": 10 , "rarity" : "3",   "name": "Ak47"              },      
-  { "weight": 5 , "rarity" : "4",  "name": "AWM"                },  
-  { "weight": 1  , "rarity" : "5", "name": "Bazooka"             }
+  { "weapon_id": 1, "gacha_id": 1, "drop_rate": 50 },
+  { "weapon_id": 2, "gacha_id": 1, "drop_rate": 50 },
+
+  { "weapon_id": 1, "gacha_id": 2, "drop_rate": 30 },
+  { "weapon_id": 2, "gacha_id": 2, "drop_rate": 30 },
+  { "weapon_id": 3, "gacha_id": 2, "drop_rate": 20 },
+  { "weapon_id": 4, "gacha_id": 2, "drop_rate": 20 },
+
+  { "weapon_id": 1, "gacha_id": 3, "drop_rate": 25 },
+  { "weapon_id": 2, "gacha_id": 3, "drop_rate": 25 },
+  { "weapon_id": 3, "gacha_id": 3, "drop_rate": 20 },
+  { "weapon_id": 4, "gacha_id": 3, "drop_rate": 20 },
+  { "weapon_id": 5, "gacha_id": 3, "drop_rate": 10 },
+
+  { "weapon_id": 1, "gacha_id": 4, "drop_rate": 15 },
+  { "weapon_id": 2, "gacha_id": 4, "drop_rate": 20 },
+  { "weapon_id": 3, "gacha_id": 4, "drop_rate": 20 },
+  { "weapon_id": 4, "gacha_id": 4, "drop_rate": 20 },
+  { "weapon_id": 5, "gacha_id": 4, "drop_rate": 15 },
+  { "weapon_id": 6, "gacha_id": 4, "drop_rate": 10 },
+
+  { "weapon_id": 3, "gacha_id": 5, "drop_rate": 25 },
+  { "weapon_id": 4, "gacha_id": 5, "drop_rate": 25 },
+  { "weapon_id": 5, "gacha_id": 5, "drop_rate": 15 },
+  { "weapon_id": 6, "gacha_id": 5, "drop_rate": 20 },
+  { "weapon_id": 7, "gacha_id": 5, "drop_rate": 20 }
 ]
