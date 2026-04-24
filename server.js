@@ -1,5 +1,5 @@
-const http = require('http')
-const mongo = require('./libs/mongo')
+const http = require("http")
+const mongo = require("./mongo")
 
 const PORT = process.env.PORT || 9888
 
@@ -7,28 +7,49 @@ async function onRequest(req, res)
 {
     const url = req.url
 
+    // 🎰 GACHA API
     if(url === "/api/gacha")
     {
-        let body = ''
+        let body = ""
 
-        req.on('data', c => body += c)
+        req.on("data", chunk => {
+            body += chunk
+        })
 
-        req.on('end', async () =>
-        {
-            const data = JSON.parse(body)
-            const playerId = data.player_id
-            const gachaId = data.gacha_id
+        req.on("end", async () => {
+            try
+            {
+                const data = JSON.parse(body)
 
-            const result = await mongo.runGacha(playerId, gachaId)
+                const result = await mongo.runGacha(
+                    data.player_id,
+                    data.gacha_id
+                )
 
-            res.writeHead(200, { "Content-Type": "application/json" })
-            res.end(JSON.stringify(result))
+                res.writeHead(200, {
+                    "Content-Type": "application/json"
+                })
+
+                res.end(JSON.stringify(result))
+            }
+            catch(err)
+            {
+                res.writeHead(500, {
+                    "Content-Type": "application/json"
+                })
+
+                res.end(JSON.stringify({
+                    status: "error",
+                    message: err.message
+                }))
+            }
         })
 
         return
     }
 
-    res.end("OK")
+    res.end("API Running")
 }
 
 http.createServer(onRequest).listen(PORT)
+console.log("Server running on " + PORT)
