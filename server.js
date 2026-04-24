@@ -10,25 +10,15 @@ async function onClientRequest(req, resp)
 
     try
     {
-        // 🔹 ของนาย
         if(req.method === 'GET' && pathname === '/api/weapons'){
-            const data = await mongo.getWeapons()
+            const data = await mongo.runMongoTest()
 
             resp.writeHead(200, { 'Content-Type': 'application/json' })
             resp.write(JSON.stringify(data))
         }
-
-        // 🔹 ของอาจารย์ (ไว้ทดสอบ)
-        else if(req.method === 'GET' && pathname === '/api/test'){
-            await mongo.runMongoTest()
-
-            resp.writeHead(200, { 'Content-Type': 'application/json' })
-            resp.write(JSON.stringify({ message: 'Test Mongo Done (check logs)' }))
-        }
-
         else{
             resp.writeHead(200, { 'Content-Type': 'application/json' })
-            resp.write(JSON.stringify({ message: 'API running' }))
+            resp.write(JSON.stringify({ message: 'Hello Vercel class' }))
         }
     }
     catch(err)
