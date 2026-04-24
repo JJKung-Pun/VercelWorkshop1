@@ -1,4 +1,3 @@
-// server.js
 const http = require('http')
 const mongo = require('./libs/mongo')
 
@@ -18,20 +17,18 @@ async function onClientRequest(req, resp) {
             return
         }
 
-        // ---------------- UPDATE CURRENCY ----------------
-        else if (req.method === 'POST' && pathname === '/api/update-currency') {
+        // ---------------- GACHA ----------------
+        else if (req.method === 'POST' && pathname === '/api/gacha') {
             let body = ''
-
             req.on('data', chunk => body += chunk)
 
             req.on('end', async () => {
                 try {
                     const data = JSON.parse(body || "{}")
 
-                    const result = await mongo.updateCurrency(
-                        data.player_id,
-                        data.money,
-                        data.diamond
+                    const result = await mongo.runGacha(
+                        data.playerId,
+                        parseInt(data.gachaId)
                     )
 
                     resp.writeHead(200, { 'Content-Type': 'application/json' })

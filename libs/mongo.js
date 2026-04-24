@@ -1,7 +1,5 @@
-// mongo.js
 const { MongoClient } = require('mongodb')
 
-// ---------------- DB CONFIG ----------------
 const db_protocol = `mongodb+srv://`,
       db_host = `cluster0.rxsbvdx.mongodb.net`,
       db_path = `/gamdb?retryWrites=true&w=majority`,
@@ -17,9 +15,8 @@ let options = {
     authMechanism: `SCRAM-SHA-1`
 }
 
-let client   // เก็บ client reuse
+let client
 
-// ---------------- CONNECT ----------------
 async function getDB() {
     if (!client) {
         client = await MongoClient.connect(db_url, options)
@@ -27,20 +24,33 @@ async function getDB() {
     return client.db('gamdb')
 }
 
-// ---------------- 🎰 GACHA ----------------
 async function runGacha(playerId, gachaId) {
     try {
         const db = await getDB()
-
         const player = await db.collection("player").findOne({ player_id: playerId })
         if (!player) return { status: "fail", message: "no player" }
 
-        const cost = 100
-        if (player.money < cost) return { status: "fail", message: "not enough money" }
+        // ✅ กำหนดค่า cost และ currency ตาม gachaId
+        const chestConfigs = {
+            1: { currency: "money", cost: 1000 },   // กล่องเงิน
+            2: { currency: "diamond", cost: 100 },  // กล่องเพชร
+            3: { currency: "diamond", cost: 150 },
+            4: { currency: "diamond", cost: 200 },
+            5: { currency: "diamond", cost: 300 }
+        }
+
+        const config = chestConfigs[gachaId]
+        if (!config) return { status: "fail", message: "invalid gachaId" }
+
+        const currency = config.currency
+        const cost = config.cost
+
+        if (player[currency] < cost)
+            return { status: "fail", message: "not enough " + currency }
 
         await db.collection("player").updateOne(
             { player_id: playerId },
-            { $inc: { money: -cost } }
+            { $inc: { [currency]: -cost } }
         )
 
         const pool = await db.collection("gacha_weapon")
@@ -71,7 +81,8 @@ async function runGacha(playerId, gachaId) {
             status: "ok",
             weapon_id: selected.weapon_id,
             weapon_name: weapon.weapon_name,
-            money_left: player.money - cost
+            money_left: player.money - (currency === "money" ? cost : 0),
+            diamond_left: player.diamond - (currency === "diamond" ? cost : 0)
         }
     } catch (err) {
         return { status: "fail", message: err.message }
