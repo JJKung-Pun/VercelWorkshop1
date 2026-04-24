@@ -10,53 +10,20 @@ async function onClientRequest(req, resp)
     try
     {
         // -------- GET WEAPONS --------
-        if(req.method === 'GET' && pathname === '/api/weapons'){
+        if(req.method === 'GET' && pathname === '/api/weapons')
+        {
             const data = await mongo.runMongoTest()
+
             resp.writeHead(200, { 'Content-Type': 'application/json' })
             resp.end(JSON.stringify(data))
-        }
-
-        // -------- REGISTER --------
-        else if(req.method === 'POST' && pathname === '/api/register'){
-            let body = ''
-            req.on('data', chunk => body += chunk)
-
-            req.on('end', async () => {
-                const data = JSON.parse(body)
-
-                const result = await mongo.register(
-                    data.username,
-                    data.password
-                )
-
-                resp.writeHead(200, { 'Content-Type': 'application/json' })
-                resp.end(JSON.stringify(result))
-            })
             return
         }
 
-        // -------- LOGIN --------
-        else if(req.method === 'POST' && pathname === '/api/login'){
+        // -------- UPDATE CURRENCY --------
+        else if(req.method === 'POST' && pathname === '/api/update-currency')
+        {
             let body = ''
-            req.on('data', chunk => body += chunk)
 
-            req.on('end', async () => {
-                const data = JSON.parse(body)
-
-                const result = await mongo.login(
-                    data.username,
-                    data.password
-                )
-
-                resp.writeHead(200, { 'Content-Type': 'application/json' })
-                resp.end(JSON.stringify(result))
-            })
-            return
-        }
-
-        // -------- UPDATE MONEY --------
-        else if(req.method === 'POST' && pathname === '/api/update-currency'){
-            let body = ''
             req.on('data', chunk => body += chunk)
 
             req.on('end', async () => {
@@ -71,12 +38,15 @@ async function onClientRequest(req, resp)
                 resp.writeHead(200, { 'Content-Type': 'application/json' })
                 resp.end(JSON.stringify(result))
             })
+
             return
         }
 
-        else{
+        else
+        {
             resp.writeHead(200, { 'Content-Type': 'application/json' })
-            resp.end(JSON.stringify({ message: 'API running' }))
+            resp.end(JSON.stringify({ message: "API running" }))
+            return
         }
     }
     catch(err)
@@ -86,6 +56,5 @@ async function onClientRequest(req, resp)
     }
 }
 
-const server = http.createServer(onClientRequest)
-server.listen(PORT)
-console.log('running on ' + PORT)
+http.createServer(onClientRequest).listen(PORT)
+console.log("running " + PORT)
